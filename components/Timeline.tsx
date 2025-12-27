@@ -4,14 +4,15 @@ import { motion } from 'framer-motion';
 import { ChevronLeft, History, Flag, Milestone, Book } from 'lucide-react';
 
 const ERAS = [
-  { year: '1811', title: 'Primera República', desc: 'Se emitieron los primeros vales de papel moneda en Venezuela.', icon: <Flag /> },
-  { year: '1843', title: 'Monedas de Cobre', desc: 'Aparecen las famosas monedas con el busto de la Libertad.', icon: <Milestone /> },
-  { year: '1879', title: 'Nace el Bolívar', desc: 'Se establece el Bolívar como unidad monetaria nacional.', icon: <History /> },
-  { year: '1940', title: 'Creación del BCV', desc: 'Nace el Banco Central para organizar nuestra economía.', icon: <Book /> },
+  { year: '1811', title: 'Primera República', desc: 'Se emitieron los primeros vales de papel moneda en Venezuela.', Icon: Flag },
+  { year: '1843', title: 'Monedas de Cobre', desc: 'Aparecen las famosas monedas con el busto de la Libertad.', Icon: Milestone },
+  { year: '1879', title: 'Nace el Bolívar', desc: 'Se establece el Bolívar como unidad monetaria nacional.', Icon: History },
+  { year: '1940', title: 'Creación del BCV', desc: 'Nace el Banco Central para organizar nuestra economía.', Icon: Book },
 ];
 
 const Timeline: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [selectedIdx, setSelectedIdx] = useState(0);
+  const CurrentIcon = ERAS[selectedIdx].Icon;
 
   return (
     <div className="flex flex-col h-full gap-6">
@@ -33,7 +34,7 @@ const Timeline: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           <div className="absolute top-[-20px] right-[-20px] w-32 h-32 bg-yellow-400/20 rounded-full blur-2xl" />
           <div className="flex items-center gap-4 mb-4">
             <div className="p-3 bg-yellow-400 rounded-2xl text-yellow-900">
-              {ERAS[selectedIdx].icon}
+              <CurrentIcon size={24} />
             </div>
             <div>
               <h3 className="text-2xl font-kids font-bold text-blue-900">{ERAS[selectedIdx].year}</h3>

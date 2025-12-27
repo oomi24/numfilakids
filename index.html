@@ -11,6 +11,8 @@
         body {
             font-family: 'Open Sans', sans-serif;
             background-color: #F5F7FA;
+            margin: 0;
+            padding: 0;
         }
         h1, h2, h3, .font-kids {
             font-family: 'Comic Neue', cursive;
@@ -21,30 +23,31 @@
         .text-bcv-blue { color: #00247D; }
         .border-bcv-blue { border-color: #00247D; }
         
-        /* Hide scrollbar for Chrome, Safari and Opera */
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
-        /* Hide scrollbar for IE, Edge and Firefox */
         .no-scrollbar {
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
     </style>
-<script type="importmap">
+    <script type="importmap">
 {
   "imports": {
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "react": "https://esm.sh/react@^19.2.3",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "framer-motion": "https://esm.sh/framer-motion@^12.23.26",
-    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
-    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@^2.45.4"
+    "react": "https://esm.sh/react@18.3.1",
+    "react/": "https://esm.sh/react@18.3.1/",
+    "react-dom": "https://esm.sh/react-dom@18.3.1",
+    "react-dom/": "https://esm.sh/react-dom@18.3.1/",
+    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+    "framer-motion": "https://esm.sh/framer-motion@11.11.17?external=react,react-dom",
+    "lucide-react": "https://esm.sh/lucide-react@0.460.0?external=react,react-dom",
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@^2.89.0"
   }
 }
 </script>
 </head>
 <body class="overflow-x-hidden">
     <div id="root"></div>
+    <script type="module" src="./index.tsx"></script>
 </body>
 </html>

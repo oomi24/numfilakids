@@ -5,8 +5,7 @@ import {
   Home, 
   Library, 
   History, 
-  Palette, 
-  ChevronLeft
+  Palette
 } from 'lucide-react';
 import { UserProfile } from './types';
 import Dashboard from './components/Dashboard';
@@ -23,10 +22,13 @@ const App: React.FC = () => {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    // Load local user data if exists
     const savedUser = localStorage.getItem('numisfila_user');
     if (savedUser) {
-      setUser(JSON.parse(savedUser));
+      try {
+        setUser(JSON.parse(savedUser));
+      } catch (e) {
+        console.error("Error cargando usuario", e);
+      }
     }
     setIsLoaded(true);
   }, []);
@@ -60,7 +62,6 @@ const App: React.FC = () => {
     if (!user) return;
     const totalPoints = user.points + newPoints;
     const newLevel = Math.floor(totalPoints / 500) + 1;
-
     setUser({ ...user, points: totalPoints, level: newLevel });
   };
 
@@ -88,51 +89,45 @@ const App: React.FC = () => {
   if (!isLoaded) {
     return (
       <div className="h-screen w-screen flex flex-col items-center justify-center bg-white">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
-          className="w-20 h-20 rounded-full border-8 border-yellow-400 border-t-blue-800"
-        />
-        <h2 className="mt-8 text-2xl font-bold text-blue-900 font-kids">Cargando NumisFila Kids...</h2>
+        <div className="w-16 h-16 rounded-full border-4 border-yellow-400 border-t-blue-800 animate-spin" />
+        <h2 className="mt-8 text-2xl font-bold text-blue-900 font-kids">Cargando NumisFila...</h2>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col max-w-4xl mx-auto shadow-2xl bg-white overflow-hidden relative">
-      {/* Header */}
+    <div className="min-h-screen flex flex-col max-w-4xl mx-auto shadow-2xl bg-white overflow-hidden relative border-x border-gray-100">
       {user && (
-        <header className="bg-blue-800 text-white p-4 flex justify-between items-center sticky top-0 z-50">
+        <header className="bg-blue-800 text-white p-4 flex justify-between items-center sticky top-0 z-50 shadow-md">
           <div className="flex items-center gap-3">
             <button 
               onClick={() => setActiveView('dashboard')}
               className="font-kids text-xl font-bold flex items-center gap-2"
             >
-              <div className="bg-yellow-400 text-blue-900 rounded-full w-8 h-8 flex items-center justify-center">🇻🇪</div>
+              <div className="bg-yellow-400 text-blue-900 rounded-full w-8 h-8 flex items-center justify-center text-sm">🇻🇪</div>
               <span className="hidden sm:inline">NumisFila Kids</span>
             </button>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <div className="text-right hidden sm:block">
-              <p className="text-sm font-bold">{user.name}</p>
-              <p className="text-xs text-yellow-300">Nivel {user.level} • {user.points} pts</p>
+              <p className="text-sm font-bold leading-none">{user.name}</p>
+              <p className="text-[10px] text-yellow-300 font-bold uppercase tracking-wider">Nivel {user.level} • {user.points} pts</p>
             </div>
-            <div className="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center text-2xl border-2 border-white">
+            <div className="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center text-2xl border-2 border-white shadow-inner">
               {user.avatar}
             </div>
           </div>
         </header>
       )}
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-y-auto p-4 pb-24 relative">
+      <main className="flex-1 overflow-y-auto p-4 pb-24 relative bg-[#F5F7FA]">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeView + (user?.name || 'none')}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
             className="h-full"
           >
             {renderView()}
@@ -140,19 +135,17 @@ const App: React.FC = () => {
         </AnimatePresence>
       </main>
 
-      {/* Footer Navigation (Mobile Sticky) */}
       {user && (
-        <nav className="bg-white border-t border-gray-200 p-2 fixed bottom-0 left-0 right-0 max-w-4xl mx-auto flex justify-around items-center z-50">
-          <NavButton icon={<Home size={24} />} label="Inicio" active={activeView === 'dashboard'} onClick={() => setActiveView('dashboard')} />
-          <NavButton icon={<Library size={24} />} label="Álbum" active={activeView === 'collection'} onClick={() => setActiveView('collection')} />
-          <NavButton icon={<History size={24} />} label="Historia" active={activeView === 'history'} onClick={() => setActiveView('history')} />
-          <NavButton icon={<Palette size={24} />} label="Crear" active={activeView === 'design'} onClick={() => setActiveView('design')} />
+        <nav className="bg-white border-t border-gray-200 p-2 fixed bottom-0 left-0 right-0 max-w-4xl mx-auto flex justify-around items-center z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
+          <NavButton icon={<Home size={22} />} label="Inicio" active={activeView === 'dashboard'} onClick={() => setActiveView('dashboard')} />
+          <NavButton icon={<Library size={22} />} label="Álbum" active={activeView === 'collection'} onClick={() => setActiveView('collection')} />
+          <NavButton icon={<History size={22} />} label="Historia" active={activeView === 'history'} onClick={() => setActiveView('history')} />
+          <NavButton icon={<Palette size={22} />} label="Crear" active={activeView === 'design'} onClick={() => setActiveView('design')} />
         </nav>
       )}
 
-      {/* Demo Disclaimer */}
-      <div className="bg-gray-100 text-[10px] text-center p-1 text-gray-500 shrink-0">
-        Demo Educativo • No requiere registro • ¡Solo juega y aprende!
+      <div className="bg-white text-[9px] text-center p-1 text-gray-400 border-t border-gray-50 uppercase tracking-widest font-bold">
+        BCV Demo Educativo • Sin Fines de Lucro
       </div>
     </div>
   );
@@ -161,7 +154,7 @@ const App: React.FC = () => {
 const NavButton: React.FC<{ icon: React.ReactNode, label: string, active: boolean, onClick: () => void }> = ({ icon, label, active, onClick }) => (
   <button 
     onClick={onClick}
-    className={`flex flex-col items-center p-2 rounded-xl transition-colors ${active ? 'text-blue-800 bg-blue-50' : 'text-gray-400'}`}
+    className={`flex flex-col items-center p-2 rounded-2xl transition-all ${active ? 'text-blue-800 bg-blue-50 scale-105' : 'text-gray-400 hover:text-blue-400'}`}
   >
     {icon}
     <span className="text-[10px] mt-1 font-bold">{label}</span>
