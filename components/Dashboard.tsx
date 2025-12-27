@@ -1,44 +1,58 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-// Added History to imports to fix name collision with global DOM History interface
-import { Gamepad2, BookOpen, Palette, Trophy, Map, History } from 'lucide-react';
+import { Gamepad2, BookOpen, Palette, Trophy, Map, History, RotateCcw } from 'lucide-react';
 import { UserProfile } from '../types';
 import { ACHIEVEMENTS } from '../constants';
 
 interface DashboardProps {
   user: UserProfile;
   setView: (view: string) => void;
+  handleLogout: () => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ user, setView }) => {
+const Dashboard: React.FC<DashboardProps> = ({ user, setView, handleLogout }) => {
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Welcome & Progress */}
-      <section className="bg-gradient-to-r from-blue-800 to-blue-600 rounded-3xl p-6 text-white shadow-lg">
-        <div className="flex justify-between items-start">
+      <section className="bg-gradient-to-r from-blue-800 to-blue-600 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
+        <div className="flex justify-between items-start z-10 relative">
           <div>
             <h2 className="text-2xl font-kids font-bold">¡Hola, {user.name}! 👋</h2>
             <p className="opacity-90">¿Qué quieres descubrir hoy?</p>
           </div>
-          <div className="bg-white/20 p-2 rounded-xl backdrop-blur-md">
-            <p className="text-xs font-bold uppercase tracking-wider">Puntos</p>
-            <p className="text-2xl font-bold text-yellow-300">{user.points}</p>
+          <div className="flex flex-col items-end gap-2">
+            <div className="bg-white/20 p-2 rounded-xl backdrop-blur-md">
+              <p className="text-xs font-bold uppercase tracking-wider">Puntos</p>
+              <p className="text-2xl font-bold text-yellow-300">{user.points}</p>
+            </div>
+            <button 
+              onClick={handleLogout}
+              className="p-2 bg-red-500/20 hover:bg-red-500/40 rounded-lg transition-colors text-white/70 hover:text-white"
+              title="Reiniciar progreso"
+            >
+              <RotateCcw size={16} />
+            </button>
           </div>
         </div>
         
-        <div className="mt-6">
+        <div className="mt-6 z-10 relative">
           <div className="flex justify-between text-xs mb-1 font-bold">
             <span>Nivel {user.level}</span>
-            <span>Próximo: {user.level + 1}</span>
+            <span>{user.points % 500} / 500 para el próximo</span>
           </div>
           <div className="h-4 bg-white/20 rounded-full overflow-hidden border border-white/30">
             <motion.div 
               initial={{ width: 0 }}
-              animate={{ width: '45%' }}
+              animate={{ width: `${(user.points % 500) / 5}%` }}
               className="h-full bg-yellow-400 shadow-[0_0_10px_rgba(255,239,112,0.8)]"
             />
           </div>
+        </div>
+
+        {/* Decorative background element */}
+        <div className="absolute right-[-20px] bottom-[-20px] text-white/5 opacity-20 rotate-12 pointer-events-none">
+          <History size={160} />
         </div>
       </section>
 
@@ -74,7 +88,6 @@ const Dashboard: React.FC<DashboardProps> = ({ user, setView }) => {
       <section>
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-kids font-bold text-blue-900">Mis Logros</h3>
-          <button className="text-blue-600 text-sm font-bold">Ver todos</button>
         </div>
         <div className="flex gap-4 overflow-x-auto pb-2 no-scrollbar">
           {ACHIEVEMENTS.map(ach => (
@@ -102,7 +115,6 @@ const Dashboard: React.FC<DashboardProps> = ({ user, setView }) => {
           <p className="text-yellow-800 text-sm">Viaja por la historia de Venezuela.</p>
         </div>
         <div className="absolute right-[-10px] top-[-10px] text-yellow-200 group-hover:rotate-12 transition-transform">
-          {/* History icon from lucide-react */}
           <History size={100} />
         </div>
       </button>

@@ -21,7 +21,12 @@ const QUESTIONS = [
   }
 ];
 
-const QuizGame: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+interface QuizGameProps {
+  onBack: () => void;
+  onScore: (score: number) => void;
+}
+
+const QuizGame: React.FC<QuizGameProps> = ({ onBack, onScore }) => {
   const [currentQ, setCurrentQ] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [score, setScore] = useState(0);
@@ -30,7 +35,8 @@ const QuizGame: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const handleSelect = (idx: number) => {
     if (selected !== null) return;
     setSelected(idx);
-    if (idx === QUESTIONS[currentQ].correct) {
+    const isCorrect = idx === QUESTIONS[currentQ].correct;
+    if (isCorrect) {
       setScore(s => s + 1);
     }
 
@@ -40,6 +46,7 @@ const QuizGame: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         setSelected(null);
       } else {
         setFinished(true);
+        onScore(score + (isCorrect ? 1 : 0));
       }
     }, 1500);
   };
@@ -93,7 +100,7 @@ const QuizGame: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           <p className="text-gray-600 mb-6">Has respondido correctamente {score} de {QUESTIONS.length} preguntas.</p>
           <div className="bg-blue-50 w-full p-4 rounded-2xl mb-8">
             <p className="text-xs font-bold text-blue-400 uppercase">Puntos Ganados</p>
-            <p className="text-4xl font-bold text-blue-800">+{score * 100}</p>
+            <p className="text-4xl font-bold text-blue-800">+{score * 50}</p>
           </div>
           <button 
             onClick={onBack}

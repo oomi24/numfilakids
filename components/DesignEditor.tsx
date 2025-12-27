@@ -3,13 +3,40 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronLeft, Download, Save, Palette, Layers, Star } from 'lucide-react';
 
+interface DesignEditorProps {
+  onBack: () => void;
+  userId: string;
+}
+
 const COLORS = ['#F9E300', '#CF142B', '#00247D', '#4D6BC6', '#FFEF70', '#E5E7EB', '#059669', '#7C3AED'];
 const SYMBOLS = ['🦅', '🇻🇪', '🌟', '🏛️', '🌿', '⛰️', '🚢', '🔥'];
 
-const DesignEditor: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+const DesignEditor: React.FC<DesignEditorProps> = ({ onBack, userId }) => {
   const [selectedColor, setSelectedColor] = useState(COLORS[0]);
   const [selectedSymbol, setSelectedSymbol] = useState(SYMBOLS[0]);
   const [type, setType] = useState<'moneda' | 'estampa'>('moneda');
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  const handleSave = () => {
+    setSaving(true);
+    // Simulate saving delay
+    setTimeout(() => {
+      setSaving(false);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+      
+      // We could store it in local storage here if we wanted to show a gallery later
+      const savedDesigns = JSON.parse(localStorage.getItem('numisfila_designs') || '[]');
+      savedDesigns.push({
+        type,
+        color: selectedColor,
+        symbol: selectedSymbol,
+        date: new Date().toISOString()
+      });
+      localStorage.setItem('numisfila_designs', JSON.stringify(savedDesigns.slice(-10))); // Keep last 10
+    }, 1000);
+  };
 
   return (
     <div className="flex flex-col h-full gap-6 pb-20">
@@ -59,12 +86,12 @@ const DesignEditor: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           <label className="text-sm font-bold text-blue-900 block mb-2 flex items-center gap-2">
             <Palette size={16} /> Color Base
           </label>
-          <div className="flex gap-2 overflow-x-auto pb-2">
+          <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
             {COLORS.map(c => (
               <button 
                 key={c}
                 onClick={() => setSelectedColor(c)}
-                className={`w-10 h-10 rounded-full border-4 transition-transform ${selectedColor === c ? 'scale-110 border-blue-900' : 'border-transparent'}`}
+                className={`w-10 h-10 rounded-full border-4 flex-shrink-0 transition-transform ${selectedColor === c ? 'scale-110 border-blue-900' : 'border-transparent'}`}
                 style={{ backgroundColor: c }}
               />
             ))}
@@ -75,12 +102,12 @@ const DesignEditor: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           <label className="text-sm font-bold text-blue-900 block mb-2 flex items-center gap-2">
             <Layers size={16} /> Símbolo Central
           </label>
-          <div className="flex gap-2 overflow-x-auto pb-2">
+          <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
             {SYMBOLS.map(s => (
               <button 
                 key={s}
                 onClick={() => setSelectedSymbol(s)}
-                className={`text-2xl p-2 bg-white rounded-xl border-2 transition-all ${selectedSymbol === s ? 'border-blue-500 scale-110' : 'border-gray-100'}`}
+                className={`text-2xl p-2 bg-white rounded-xl border-2 flex-shrink-0 transition-all ${selectedSymbol === s ? 'border-blue-500 scale-110' : 'border-gray-100'}`}
               >
                 {s}
               </button>
@@ -89,10 +116,14 @@ const DesignEditor: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         </div>
 
         <div className="flex gap-4">
-          <button className="flex-1 bg-blue-800 text-white font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2">
-            <Save size={20} /> Guardar
+          <button 
+            onClick={handleSave}
+            disabled={saving}
+            className={`flex-1 ${saved ? 'bg-green-500' : 'bg-blue-800'} text-white font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 transition-colors disabled:opacity-50`}
+          >
+            {saving ? 'Guardando...' : saved ? '¡Diseño Guardado!' : <><Save size={20} /> Guardar</>}
           </button>
-          <button className="bg-yellow-400 text-yellow-900 p-4 rounded-2xl shadow-lg">
+          <button className="bg-yellow-400 text-yellow-900 p-4 rounded-2xl shadow-lg hover:bg-yellow-300">
             <Download size={24} />
           </button>
         </div>

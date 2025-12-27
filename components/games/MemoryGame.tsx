@@ -14,9 +14,10 @@ interface Card {
 
 interface MemoryGameProps {
   onBack: () => void;
+  onWin: () => void;
 }
 
-const MemoryGame: React.FC<MemoryGameProps> = ({ onBack }) => {
+const MemoryGame: React.FC<MemoryGameProps> = ({ onBack, onWin }) => {
   const [cards, setCards] = useState<Card[]>([]);
   const [flippedCards, setFlippedCards] = useState<number[]>([]);
   const [moves, setMoves] = useState(0);
@@ -63,7 +64,10 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onBack }) => {
         setFlippedCards([]);
         setMatches(m => m + 1);
         if (matches + 1 === SYMBOLS.length) {
-          setTimeout(() => setShowWin(true), 500);
+          setTimeout(() => {
+            setShowWin(true);
+            onWin();
+          }, 500);
         }
       } else {
         setTimeout(() => {
@@ -125,6 +129,7 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onBack }) => {
               <span className="text-6xl mb-4 block">🏆</span>
               <h2 className="text-3xl font-kids font-bold text-blue-900 mb-2">¡Increíble!</h2>
               <p className="text-gray-600 mb-6">Has encontrado todos los símbolos históricos en {moves} movimientos.</p>
+              <p className="text-blue-800 font-bold mb-6 text-xl">¡Ganaste 150 puntos!</p>
               <div className="flex flex-col gap-2">
                 <button 
                   onClick={initGame}

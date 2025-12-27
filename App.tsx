@@ -3,16 +3,12 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Home, 
-  Gamepad2, 
   Library, 
   History, 
   Palette, 
-  Trophy, 
-  User as UserIcon,
-  LogOut,
   ChevronLeft
 } from 'lucide-react';
-import { UserProfile, GameType } from './types';
+import { UserProfile } from './types';
 import Dashboard from './components/Dashboard';
 import MemoryGame from './components/games/MemoryGame';
 import QuizGame from './components/games/QuizGame';
@@ -27,33 +23,65 @@ const App: React.FC = () => {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    // Simulate loading
-    setTimeout(() => setIsLoaded(true), 1000);
+    // Load local user data if exists
+    const savedUser = localStorage.getItem('numisfila_user');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+    setIsLoaded(true);
   }, []);
 
-  const handleLogin = (profile: UserProfile) => {
-    setUser(profile);
-    setActiveView('dashboard');
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem('numisfila_user', JSON.stringify(user));
+    }
+  }, [user]);
+
+  const handleStart = (name: string, avatar: string) => {
+    const newUser: UserProfile = {
+      name,
+      age: 8,
+      avatar,
+      points: 100,
+      level: 1
+    };
+    setUser(newUser);
+  };
+
+  const handleReset = () => {
+    if (confirm('¿Quieres borrar tu progreso y empezar de nuevo?')) {
+      localStorage.removeItem('numisfila_user');
+      setUser(null);
+      setActiveView('dashboard');
+    }
+  };
+
+  const handleUpdatePoints = (newPoints: number) => {
+    if (!user) return;
+    const totalPoints = user.points + newPoints;
+    const newLevel = Math.floor(totalPoints / 500) + 1;
+
+    setUser({ ...user, points: totalPoints, level: newLevel });
   };
 
   const renderView = () => {
-    if (!user) return <Login onLogin={handleLogin} />;
+    if (!user) return <Login onLogin={handleStart} />;
 
     switch (activeView) {
       case 'dashboard':
-        return <Dashboard user={user} setView={setActiveView} />;
+        return <Dashboard user={user} setView={setActiveView} handleLogout={handleReset} />;
       case 'game-memory':
-        return <MemoryGame onBack={() => setActiveView('dashboard')} />;
+        return <MemoryGame onBack={() => setActiveView('dashboard')} onWin={() => handleUpdatePoints(150)} />;
       case 'game-quiz':
-        return <QuizGame onBack={() => setActiveView('dashboard')} />;
+        return <QuizGame onBack={() => setActiveView('dashboard')} onScore={(score) => handleUpdatePoints(score * 50)} />;
       case 'collection':
         return <VirtualAlbum onBack={() => setActiveView('dashboard')} />;
       case 'history':
         return <Timeline onBack={() => setActiveView('dashboard')} />;
       case 'design':
-        return <DesignEditor onBack={() => setActiveView('dashboard')} />;
+        return <DesignEditor onBack={() => setActiveView('dashboard')} userId="local-user" />;
       default:
-        return <Dashboard user={user} setView={setActiveView} />;
+        return <Dashboard user={user} setView={setActiveView} handleLogout={handleReset} />;
     }
   };
 
@@ -71,7 +99,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col max-w-4xl mx-auto shadow-2xl bg-white overflow-hidden">
+    <div className="min-h-screen flex flex-col max-w-4xl mx-auto shadow-2xl bg-white overflow-hidden relative">
       {/* Header */}
       {user && (
         <header className="bg-blue-800 text-white p-4 flex justify-between items-center sticky top-0 z-50">
@@ -81,7 +109,7 @@ const App: React.FC = () => {
               className="font-kids text-xl font-bold flex items-center gap-2"
             >
               <div className="bg-yellow-400 text-blue-900 rounded-full w-8 h-8 flex items-center justify-center">🇻🇪</div>
-              NumisFila Kids
+              <span className="hidden sm:inline">NumisFila Kids</span>
             </button>
           </div>
           <div className="flex items-center gap-4">
@@ -100,7 +128,7 @@ const App: React.FC = () => {
       <main className="flex-1 overflow-y-auto p-4 pb-24 relative">
         <AnimatePresence mode="wait">
           <motion.div
-            key={activeView}
+            key={activeView + (user?.name || 'none')}
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
@@ -122,9 +150,9 @@ const App: React.FC = () => {
         </nav>
       )}
 
-      {/* Disclaimer Modal Overlay Logic could go here */}
-      <div className="bg-gray-100 text-[10px] text-center p-1 text-gray-500">
-        Demo Educativo • No contiene billetes reales • BCV Inspirado
+      {/* Demo Disclaimer */}
+      <div className="bg-gray-100 text-[10px] text-center p-1 text-gray-500 shrink-0">
+        Demo Educativo • No requiere registro • ¡Solo juega y aprende!
       </div>
     </div>
   );
